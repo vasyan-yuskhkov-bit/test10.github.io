@@ -26,15 +26,13 @@ const questions = [
 ];
 
 let currentQ = 0, score = 0, userName = "", answers = [];
-
-// ================== СТАТИЧЕСКИЙ ОПРОС О ПРИВИВКЕ ==================
 let hasVoted = false;
 
+// ================== ОПРОС О ПРИВИВКЕ ==================
 async function answerVaccine(yes) {
   if (hasVoted) return;
-
+  
   hasVoted = true;
-
   document.getElementById('btnYes').disabled = true;
   document.getElementById('btnNo').disabled = true;
   document.getElementById('vaccineThankYou').classList.remove('hidden');
@@ -69,7 +67,7 @@ async function loadVaccineStats() {
       ❌ Нет — ${noPercent}% (${total - yesCount} чел.)
     `;
   } catch (e) {
-    statsEl.textContent = "Ошибка загрузки статистики";
+    statsEl.textContent = "Статистика прививок загружается...";
   }
 }
 
@@ -167,7 +165,7 @@ function loginAdmin() {
 async function saveResultToFirebase(percent) {
   try {
     await db.collection("testResults").add({
-      name: userName,
+      name: userName || "Аноним",
       date: new Date().toLocaleString('ru-RU'),
       score: percent,
       correct: score,
@@ -176,12 +174,12 @@ async function saveResultToFirebase(percent) {
   } catch (e) {}
 }
 
-function startQuiz() {
+function startTest() {
   userName = document.getElementById('userName').value.trim();
-  if (!userName) return alert("Введите имя!");
-
-  document.getElementById('startScreen').classList.add('hidden');
-  document.getElementById('quizScreen').classList.remove('hidden');
+  if (!userName) {
+    alert("Пожалуйста, введите ваше имя!");
+    return;
+  }
 
   currentQ = 0;
   answers = [];
@@ -230,7 +228,7 @@ async function showResult() {
   });
 
   const percent = Math.round((score / 10) * 100);
-  document.getElementById('resultUser').textContent = userName;
+  document.getElementById('resultUser').textContent = userName || "Аноним";
 
   const circle = document.getElementById('scoreCircle');
   circle.textContent = percent + '%';
@@ -253,4 +251,5 @@ window.onload = () => {
   loadWeather();
   loadLeaderboard();
   loadVaccineStats();
+  startTest(); // Автозапуск теста (имя нужно будет ввести)
 };
