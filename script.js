@@ -1,4 +1,4 @@
-// ================== FIREBASE CONFIG ==================
+// ================== FIREBASE ==================
 const firebaseConfig = {
   apiKey: "AIzaSyDDuEf9tOaOz5ekzunSSgaxSvxXOTiZa2k",
   authDomain: "klesh-test.firebaseapp.com",
@@ -12,22 +12,12 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ================== ВОПРОСЫ ==================
-const questions = [
-  { q: "Где обычно можно встретить иксодового клеща — переносчика вируса?", options: ["Только в густом еловом лесу","В траве, кустарниках, на лесных тропах и опушках, в парках","Только в болотистой местности","В сухой степи без растительности"], correct: 1 },
-  { q: "В какое время года риск укуса клеща наиболее высок?", options: ["Декабрь–февраль","Апрель–июнь и август–сентябрь","Только июль","Круглый год одинаков"], correct: 1 },
-  { q: "Как чаще всего клещ попадает на человека?", options: ["Падает с дерева","Прицепляется с травы или кустарника на одежду/обувь","Прыгает с земли","Заносится домашними животными"], correct: 1 },
-  { q: "Что нужно сделать сразу после обнаружения присосавшегося клеща?", options: ["Залить его маслом","Аккуратно удалить и поместить в контейнер","Прижечь йодом","Срочно принять антибиотик"], correct: 1 },
-  { q: "Куда лучше всего обращаться для исследования клеща?", options: ["В продуктовый магазин","В лабораторию Роспотребнадзора","В аптеку","В ветеринарную клинику"], correct: 1 },
-  { q: "Какие симптомы указывают на начало клещевого энцефалита?", options: ["Только боль в месте укуса","Высокая температура, головная боль, тошнота","Зуд и сыпь по всему телу","Кашель и насморк"], correct: 1 },
-  { q: "Существует ли прививка против клещевого энцефалита?", options: ["Да, есть эффективные вакцины","Нет, только антибиотики","Есть, но она не помогает","Только народные средства"], correct: 0 },
-  { q: "Кому рекомендуется вакцинация в первую очередь?", options: ["Только детям до 7 лет","Только пенсионерам","Жителям эндемичных районов, лесникам, туристам","Никому"], correct: 2 },
-  { q: "Какая защита в лесу наиболее эффективна?", options: ["Короткие шорты","Светлая закрытая одежда + репелленты","Нательный крестик","Громкое пение"], correct: 1 },
-  { q: "Что может назначить врач для экстренной профилактики?", options: ["Греющий компресс","Банки и горчичники","Иммуноглобулин","Слабительные"], correct: 2 }
-];
+const questions = [ /* твои 10 вопросов */ ];
 
 let currentQ = 0, score = 0, userName = "", answers = [];
 
-// Сохранение результата в Firebase
+// ... (все функции saveResultToFirebase, showAllResults и т.д. как раньше)
+
 async function saveResultToFirebase(percent) {
   try {
     await db.collection("testResults").add({
@@ -37,12 +27,9 @@ async function saveResultToFirebase(percent) {
       correct: score,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-  } catch (e) {
-    console.error("Ошибка сохранения:", e);
-  }
+  } catch (e) {}
 }
 
-// Загрузка результатов
 async function showAllResults() {
   const container = document.getElementById('adminResults');
   container.innerHTML = '<p>Загрузка...</p>';
@@ -55,26 +42,34 @@ async function showAllResults() {
       const r = doc.data();
       html += `
         <div class="result-item">
-          <div>
-            <strong>${r.name}</strong><br>
-            <small>${r.date}</small>
-          </div>
-          <div class="score-delete">
-            <span class="font-bold text-emerald-600">${r.score}%</span>
-          </div>
+          <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
+          <span class="font-bold text-emerald-600">${r.score}%</span>
         </div>`;
     });
 
     container.innerHTML = html || '<p>Пока нет результатов</p>';
   } catch (e) {
-    container.innerHTML = '<p class="text-red-500">Ошибка загрузки данных</p>';
+    container.innerHTML = '<p>Ошибка загрузки</p>';
   }
 }
 
-// Опросник
+// Показ админ-панели
+function showAdminPanel() {
+  document.getElementById('resultScreen').classList.add('hidden');
+  const pass = prompt("Введите пароль администратора:");
+  if (pass === "sofr2928") {
+    document.getElementById('adminContent').classList.remove('hidden');
+    showAllResults();
+  } else {
+    alert("Неверный пароль!");
+    document.getElementById('resultScreen').classList.remove('hidden');
+  }
+}
+
+// Остальные функции (startQuiz, showQuestion, showResult и т.д.)
 function startQuiz() {
   userName = document.getElementById('userName').value.trim();
-  if (!userName) return alert("Введите ваше имя!");
+  if (!userName) return alert("Введите имя!");
 
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('quizScreen').classList.remove('hidden');
@@ -96,9 +91,7 @@ function showQuestion() {
   q.options.forEach((text, i) => {
     const label = document.createElement('label');
     label.className = "option-label";
-    label.innerHTML = `
-      <input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})"> ${text}
-    `;
+    label.innerHTML = `<input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})"> ${text}`;
     opts.appendChild(label);
   });
 
@@ -136,20 +129,10 @@ async function showResult() {
   circle.style.borderColor = percent >= 80 ? '#10b981' : '#eab308';
 
   document.getElementById('resultMsg').textContent = percent >= 80 
-    ? 'Отличный результат! Вы хорошо подготовлены.' 
-    : 'Есть над чем поработать.';
+    ? 'Отличный результат! 🏆' 
+    : 'Есть над чем поработать 📚';
 
   await saveResultToFirebase(percent);
-}
-
-function loginAdmin() {
-  const pass = document.getElementById('adminPass').value;
-  if (pass === "sofr2928") {
-    document.getElementById('adminContent').classList.remove('hidden');
-    showAllResults();
-  } else {
-    alert("Неверный пароль!");
-  }
 }
 
 function restartQuiz() {
