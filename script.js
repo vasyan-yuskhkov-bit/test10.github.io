@@ -12,7 +12,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ================== ВОПРОСЫ ==================
-const questions = [ /* все 10 вопросов */ 
+const questions = [
   { q: "Что является основным переносчиком клещевого энцефалита?", options: ["Комары", "Клещи", "Мухи", "Блохи"], correct: 1 },
   { q: "В какое время года наиболее активны клещи?", options: ["Зима", "Весна и осень", "Только лето", "Круглый год"], correct: 1 },
   { q: "Можно ли заразиться через сырое молоко?", options: ["Нет", "Да", "Только через укус", "Через воздух"], correct: 1 },
@@ -28,7 +28,7 @@ const questions = [ /* все 10 вопросов */
 let currentQ = 0, score = 0, userName = "", answers = [];
 let hasVoted = false;
 
-// ================== ПРИВИВКА ==================
+// ================== ОПРОС О ПРИВИВКЕ ==================
 async function answerVaccine(yes) {
   if (hasVoted) return;
   hasVoted = true;
@@ -58,28 +58,55 @@ async function loadVaccineStats() {
     const yesPercent = total > 0 ? Math.round((yesCount / total) * 100) : 0;
     statsEl.innerHTML = `
       <strong>Статистика прививок:</strong><br>
-      ✅ Да — ${yesPercent}% (${yesCount} чел.) &nbsp;&nbsp; 
-      ❌ Нет — ${100 - yesPercent}% (${total - yesCount} чел.)
+      ✅ Да — ${yesPercent}% (${yesCount}) &nbsp;&nbsp; 
+      ❌ Нет — ${100 - yesPercent}% (${total - yesCount})
     `;
   } catch (e) {
     statsEl.textContent = "Статистика обновляется...";
   }
 }
 
-// ================== ПОГОДА (улучшено) ==================
+// ================== ПОГОДА ==================
 async function loadWeather() {
   const weatherEl = document.getElementById('weather');
-  weatherEl.textContent = '🌡️ Загрузка...';
   try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.95&longitude=92.35&current_weather=true', { 
-      method: 'GET',
-      cache: 'no-cache'
-    });
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.95&longitude=92.35&current_weather=true');
+    if (!res.ok) throw new Error();
     const data = await res.json();
-    const temp = Math.round(data.current_weather.temperature);
+    const temp = Math.round(data.current_weather?.temperature || 0);
     weatherEl.innerHTML = `🌡️ Дивногорск: <strong>${temp}°C</strong>`;
   } catch (e) {
     weatherEl.innerHTML = `🌡️ Дивногорск: <strong>— °C</strong>`;
+  }
+}
+
+// ================== ЛИДЕРБОРД ==================
+async function loadLeaderboard() {
+  const container = document.getElementById('leaderboard');
+  try {
+    const snapshot = await db.collection("testResults")
+      .orderBy("score", "desc")
+      .limit(3)
+      .get();
+
+    let html = '';
+    let place = 1;
+    const medals = ['🥇', '🥈', '🥉'];
+
+    snapshot.forEach(doc => {
+      const r = doc.data();
+      html += `
+        <div class="leader-item">
+          <span class="medal">${medals[place-1]}</span>
+          <strong>${r.name}</strong>
+          <span class="leader-score">${r.score}%</span>
+        </div>`;
+      place++;
+    });
+
+    container.innerHTML = html || '<p>Пока нет результатов</p>';
+  } catch (e) {
+    container.innerHTML = '<p>Ошибка загрузки лидерборда</p>';
   }
 }
 
@@ -91,6 +118,22 @@ function loginAdmin() {
     showAllResults();
   } else {
     alert("Неверный пароль!");
+  }
+}
+
+async function showAllResults() {
+  const container = document.getElementById('adminResults');
+  container.innerHTML = '<p>Загрузка...</p>';
+  try {
+    const snapshot = await db.collection("testResults").orderBy("timestamp", "desc").get();
+    let html = `<p style="margin-bottom:15px; font-weight:600;">Всего прохождений: ${snapshot.size}</p>`;
+    snapshot.forEach(doc => {
+      const r = doc.data();
+      html += `<div class="result-item"><strong>${r.name}</strong> — ${r.score}%</div>`;
+    });
+    container.innerHTML = html || '<p>Пока нет результатов</p>';
+  } catch (e) {
+    container.innerHTML = '<p>Ошибка загрузки</p>';
   }
 }
 
@@ -107,8 +150,78 @@ function startQuiz() {
   showQuestion();
 }
 
-// (остальные функции showQuestion, selectAnswer, nextQuestion, showResult и т.д. — оставлены как в предыдущей версии)
+function showQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('qNum').textContent = currentQ + 1;
+  document.getElementById('questionText').textContent = q.q;
 
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+
+  q.options.forEach((text, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `<input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})"> ${text}`;
+    opts.appendChild(div);
+  });
+
+  document.getElementById('nextBtn').classList.add('hidden');
+}
+
+function selectAnswer(index) {
+  answers[currentQ] = index;
+  document.getElementById('nextBtn').classList.remove('hidden');
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+async function showResult() {
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+
+  score = 0;
+  answers.forEach((ans, i) => {
+    if (ans === questions[i].correct) score++;
+  });
+
+  const percent = Math.round((score / 10) * 100);
+  document.getElementById('resultUser').textContent = userName;
+
+  const circle = document.getElementById('scoreCircle');
+  circle.textContent = percent + '%';
+  circle.style.borderColor = percent >= 80 ? '#22c55e' : '#eab308';
+
+  document.getElementById('resultMsg').innerHTML = percent >= 80 
+    ? 'Отличный результат! 🏆' 
+    : 'Есть над чем поработать 📚';
+
+  await saveResultToFirebase(percent);
+  loadLeaderboard();
+}
+
+async function saveResultToFirebase(percent) {
+  try {
+    await db.collection("testResults").add({
+      name: userName,
+      date: new Date().toLocaleString('ru-RU'),
+      score: percent,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {}
+}
+
+function restartQuiz() {
+  location.reload();
+}
+
+// ================== ЗАПУСК ==================
 window.onload = () => {
   loadWeather();
   loadLeaderboard();
