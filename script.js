@@ -1,4 +1,4 @@
-// ================== FIREBASE ==================
+// ================== FIREBASE CONFIG ==================
 const firebaseConfig = {
   apiKey: "AIzaSyDDuEf9tOaOz5ekzunSSgaxSvxXOTiZa2k",
   authDomain: "klesh-test.firebaseapp.com",
@@ -12,7 +12,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ================== ВОПРОСЫ ==================
-const questions = [ /* твои 10 вопросов */ 
+const questions = [
   { q: "Где обычно можно встретить иксодового клеща — переносчика вируса?", options: ["Только в густом еловом лесу","В траве, кустарниках, на лесных тропах и опушках, в парках","Только в болотистой местности","В сухой степи без растительности"], correct: 1 },
   { q: "В какое время года риск укуса клеща наиболее высок?", options: ["Декабрь–февраль","Апрель–июнь и август–сентябрь","Только июль","Круглый год одинаков"], correct: 1 },
   { q: "Как чаще всего клещ попадает на человека?", options: ["Падает с дерева","Прицепляется с травы или кустарника на одежду/обувь","Прыгает с земли","Заносится домашними животными"], correct: 1 },
@@ -27,22 +27,26 @@ const questions = [ /* твои 10 вопросов */
 
 let currentQ = 0, score = 0, userName = "", answers = [];
 
-// Автообновление админ-панели
-let autoUpdateInterval;
-
+// Сохранение результата в Firebase
 async function saveResultToFirebase(percent) {
   try {
     await db.collection("testResults").add({
       name: userName,
-      date: new Date().toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }),
+      date: new Date().toLocaleString('ru-RU'),
       score: percent,
       correct: score,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-  } catch (e) {}
+  } catch (e) {
+    console.error("Ошибка сохранения:", e);
+  }
 }
 
+// Загрузка результатов
 async function showAllResults() {
+  const container = document.getElementById('adminResults');
+  container.innerHTML = '<p>Загрузка...</p>';
+
   try {
     const snapshot = await db.collection("testResults").orderBy("timestamp", "desc").get();
     let html = `<p class="mb-4">Всего прохождений: ${snapshot.size}</p>`;
@@ -50,21 +54,27 @@ async function showAllResults() {
     snapshot.forEach(doc => {
       const r = doc.data();
       html += `
-        <div class="p-4 bg-gray-50 rounded-2xl mb-3">
-          <strong>${r.name}</strong><br>
-          <small>${r.date}</small> — <span class="font-bold text-indigo-600">${r.score}%</span>
+        <div class="result-item">
+          <div>
+            <strong>${r.name}</strong><br>
+            <small>${r.date}</small>
+          </div>
+          <div class="score-delete">
+            <span class="font-bold text-emerald-600">${r.score}%</span>
+          </div>
         </div>`;
     });
 
-    document.getElementById('adminResults').innerHTML = html || '<p>Пока нет результатов</p>';
+    container.innerHTML = html || '<p>Пока нет результатов</p>';
   } catch (e) {
-    document.getElementById('adminResults').innerHTML = '<p>Ошибка загрузки</p>';
+    container.innerHTML = '<p class="text-red-500">Ошибка загрузки данных</p>';
   }
 }
 
+// Опросник
 function startQuiz() {
   userName = document.getElementById('userName').value.trim();
-  if (!userName) return alert("Введите имя!");
+  if (!userName) return alert("Введите ваше имя!");
 
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('quizScreen').classList.remove('hidden');
@@ -86,15 +96,17 @@ function showQuestion() {
   q.options.forEach((text, i) => {
     const label = document.createElement('label');
     label.className = "option-label";
-    label.innerHTML = `<input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})"> ${text}`;
+    label.innerHTML = `
+      <input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})"> ${text}
+    `;
     opts.appendChild(label);
   });
 
   document.getElementById('nextBtn').classList.add('hidden');
 }
 
-function selectAnswer(i) {
-  answers[currentQ] = i;
+function selectAnswer(index) {
+  answers[currentQ] = index;
   document.getElementById('nextBtn').classList.remove('hidden');
 }
 
@@ -121,11 +133,11 @@ async function showResult() {
 
   const circle = document.getElementById('scoreCircle');
   circle.textContent = percent + '%';
-  circle.style.borderColor = percent >= 80 ? '#22c55e' : '#eab308';
+  circle.style.borderColor = percent >= 80 ? '#10b981' : '#eab308';
 
   document.getElementById('resultMsg').textContent = percent >= 80 
-    ? 'Отличный результат! 🏆' 
-    : 'Есть над чем поработать 📚';
+    ? 'Отличный результат! Вы хорошо подготовлены.' 
+    : 'Есть над чем поработать.';
 
   await saveResultToFirebase(percent);
 }
@@ -135,10 +147,6 @@ function loginAdmin() {
   if (pass === "sofr2928") {
     document.getElementById('adminContent').classList.remove('hidden');
     showAllResults();
-    // Автообновление каждые 5 секунд
-    if (!autoUpdateInterval) {
-      autoUpdateInterval = setInterval(showAllResults, 5000);
-    }
   } else {
     alert("Неверный пароль!");
   }
