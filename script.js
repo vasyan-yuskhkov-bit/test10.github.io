@@ -25,47 +25,46 @@ const questions = [
   { q: "Что является самым надёжным методом защиты?", options: ["Только репелленты", "Вакцина + защита от укусов", "Только осмотр", "Антибиотики"], correct: 1 }
 ];
 
-let currentQ = 0, score = 0, userName = "", answers = [], timerInterval = null;
+let currentQ = 0, score = 0, userName = "", answers = [];
 
-// ================== ЗВУКИ ==================
-const clickSound = new Audio('https://freesound.org/data/previews/66/66929_931655-lq.mp3');
-const successSound = new Audio('https://freesound.org/data/previews/387/387186_7258992-lq.mp3');
-const warningSound = new Audio('https://freesound.org/data/previews/276/276951_5121236-lq.mp3');
+// ================== ПЕРВЫЙ ВОПРОС О ПРИВИВКЕ ==================
+async function answerVaccine(yes) {
+  try {
+    await db.collection("vaccineStats").add({
+      vaccinated: yes,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {}
 
-// ================== ТАЙМЕР ==================
-function startTimer() {
-  let timeLeft = 480; // 8 минут
-  const timerEl = document.getElementById('timeLeft');
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-    if (timeLeft <= 60) timerEl.style.color = '#ef4444';
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      alert("Время вышло! Тест завершён.");
-      showResult();
-    }
-  }, 1000);
+  document.getElementById('vaccineScreen').classList.add('hidden');
+  document.getElementById('startScreen').classList.remove('hidden');
+  loadVaccineStats();
 }
 
-// ================== ПОГОДА ==================
-async function loadWeather() {
-  const weatherEl = document.getElementById('weather');
+async function loadVaccineStats() {
+  const statsEl = document.getElementById('vaccineStats');
   try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.95&longitude=92.35&current_weather=true');
-    const data = await res.json();
-    const temp = Math.round(data.current_weather.temperature);
-    weatherEl.innerHTML = `🌡️ Дивногорск: <strong>${temp}°C</strong>`;
+    const snapshot = await db.collection("vaccineStats").get();
+    let yesCount = 0, total = 0;
+
+    snapshot.forEach(doc => {
+      total++;
+      if (doc.data().vaccinated) yesCount++;
+    });
+
+    const yesPercent = total > 0 ? Math.round((yesCount / total) * 100) : 0;
+    const noPercent = 100 - yesPercent;
+
+    statsEl.innerHTML = `
+      <strong>Статистика прививок:</strong><br>
+      ✅ Да — ${yesPercent}% &nbsp;&nbsp; ❌ Нет — ${noPercent}%
+    `;
   } catch (e) {
-    weatherEl.textContent = '🌡️ Дивногорск — погода загружается...';
+    statsEl.textContent = "Статистика прививок загружается...";
   }
 }
 
-// ================== ЛИДЕРБОРД (ТОП-3) ==================
+// ================== ЛИДЕРБОРД ==================
 async function loadLeaderboard() {
   const container = document.getElementById('leaderboard');
   try {
@@ -92,6 +91,19 @@ async function loadLeaderboard() {
     container.innerHTML = html || '<p>Пока нет результатов</p>';
   } catch (e) {
     container.innerHTML = '<p>Ошибка загрузки лидерборда</p>';
+  }
+}
+
+// ================== ПОГОДА ==================
+async function loadWeather() {
+  const weatherEl = document.getElementById('weather');
+  try {
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.95&longitude=92.35&current_weather=true');
+    const data = await res.json();
+    const temp = Math.round(data.current_weather.temperature);
+    weatherEl.innerHTML = `🌡️ Дивногорск: <strong>${temp}°C</strong>`;
+  } catch (e) {
+    weatherEl.textContent = '🌡️ Дивногорск — погода загружается...';
   }
 }
 
@@ -142,7 +154,7 @@ function loginAdmin() {
   }
 }
 
-// ================== ТЕСТ ==================
+// ================== ОСНОВНОЙ ТЕСТ ==================
 async function saveResultToFirebase(percent) {
   try {
     await db.collection("testResults").add({
@@ -164,7 +176,6 @@ function startQuiz() {
 
   currentQ = 0;
   answers = [];
-  startTimer();
   showQuestion();
 }
 
@@ -196,7 +207,6 @@ function nextQuestion() {
   if (currentQ < questions.length) {
     showQuestion();
   } else {
-    clearInterval(timerInterval);
     showResult();
   }
 }
@@ -226,7 +236,6 @@ async function showResult() {
 }
 
 function restartQuiz() {
-  clearInterval(timerInterval);
   location.reload();
 }
 
@@ -234,4 +243,5 @@ function restartQuiz() {
 window.onload = () => {
   loadWeather();
   loadLeaderboard();
+  loadVaccineStats();
 };
