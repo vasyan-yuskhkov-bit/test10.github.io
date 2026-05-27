@@ -3,73 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Медицинский опросник</title>
+  <title>Клещевой энцефалит — Тест</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="container">
 
+    <!-- HEADER -->
     <div class="header">
-      <div class="flex items-center gap-3">
-        <i class="fa-solid fa-heart-pulse text-4xl"></i>
-        <div>
-          <h1>Клещевой энцефалит</h1>
-          <p>Тест знаний и защита здоровья</p>
-        </div>
+      <h1>🧠 Клещевой энцефалит</h1>
+      <p>Тест знаний и защита здоровья</p>
+    </div>
+
+    <!-- START SCREEN -->
+    <div id="startScreen" class="card">
+      <h2>Тест: Клещевой энцефалит</h2>
+      <input type="text" id="userName" class="input" placeholder="Ваше имя" required>
+      <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quizScreen" class="card hidden">
+      <h2>Вопрос <span id="qNum">1</span>/10</h2>
+      <p id="questionText" style="font-size:18px; margin-bottom:20px;"></p>
+      
+      <div id="options" class="options"></div>
+      
+      <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary hidden">Далее →</button>
+      <div id="quizUser" style="margin-top:15px; text-align:center; font-weight:600;"></div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="resultScreen" class="card hidden">
+      <h2>Результат для <span id="resultUser"></span></h2>
+      
+      <div id="scoreCircle" class="score-circle">0%</div>
+      
+      <p id="resultMsg" style="text-align:center; font-size:20px; margin:15px 0;"></p>
+      
+      <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
+      <button onclick="showAdminPanel()" class="btn" style="background:#64748b; margin-top:10px;">👨‍💼 Админ-панель</button>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminContent" class="card hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2>👨‍💼 Админ-панель</h2>
+        <button onclick="hideAdminPanel()" class="btn" style="background:#ef4444; width:auto; padding:10px 20px;">✕ Закрыть</button>
+      </div>
+      
+      <button onclick="exportToCSV()" class="btn" style="background:#10b981; margin-bottom:15px;">📊 Экспорт в CSV</button>
+      
+      <div id="adminResults">
+        <p>Загрузка результатов...</p>
       </div>
     </div>
 
-    <div class="main-content">
-
-      <!-- Опросник -->
-      <div class="card">
-        <h2><i class="fa-solid fa-clipboard-question"></i> Тест: Клещевой энцефалит</h2>
-
-        <div id="startScreen">
-          <input type="text" id="userName" placeholder="Ваше имя" class="input">
-          <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
-        </div>
-
-        <div id="quizScreen" class="hidden">
-          <div class="progress">Вопрос <span id="qNum">1</span>/10 • <span id="quizUser"></span></div>
-          <h3 id="questionText"></h3>
-          <div id="options" class="options"></div>
-          <button id="nextBtn" onclick="nextQuestion()" class="hidden btn btn-primary">Далее →</button>
-        </div>
-
-        <div id="resultScreen" class="hidden text-center">
-          <h3>Результат для <span id="resultUser"></span></h3>
-          <div id="scoreCircle" class="score-circle"></div>
-          <p id="resultMsg" class="result-text"></p>
-          
-          <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
-          <button onclick="showAdminPanel()" class="btn btn-outline">👨‍💼 Админ-панель</button>
-        </div>
+    <!-- MEMO -->
+    <div class="memo-card">
+      <h2>📌 Памятка: Защита от клещей</h2>
+      <div class="memo">
+        <h3>🛡️ Профилактика</h3>
+        <ul>
+          <li>Носите светлую закрытую одежду</li>
+          <li>Обрабатывайте одежду репеллентами</li>
+          <li>Делайте осмотр после прогулки</li>
+        </ul>
+        
+        <h3>🔧 Удаление клеща</h3>
+        <ul>
+          <li>Используйте пинцет</li>
+          <li>Выкручивайте против часовой стрелки</li>
+          <li><strong>Не используйте масло!</strong></li>
+        </ul>
       </div>
-
-      <!-- Памятка -->
-      <div class="card memo-card">
-        <h2><i class="fa-solid fa-shield-halved"></i> Памятка: Защита от клещей</h2>
-        <div class="memo">
-          <h3>🛡️ Профилактика</h3>
-          <ul>
-            <li>Носите светлую закрытую одежду</li>
-            <li>Обрабатывайте одежду репеллентами</li>
-            <li>Делайте осмотр после прогулки</li>
-          </ul>
-          <h3>🔧 Удаление клеща</h3>
-          <ul>
-            <li>Используйте пинцет</li>
-            <li>Выкручивайте против часовой стрелки</li>
-            <li>Не используйте масло!</li>
-          </ul>
-        </div>
-      </div>
-
     </div>
+
   </div>
 
   <script src="script.js"></script>
