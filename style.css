@@ -153,3 +153,85 @@ body {
 }
 
 .hidden { display: none !important; }
+/* Улучшенный дизайн и анимации */
+.input-name {
+  width: 100%;
+  padding: 16px;
+  margin: 15px 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  font-size: 17px;
+  transition: all 0.3s;
+}
+
+.input-name:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.start-btn {
+  margin-top: 10px;
+  font-size: 20px;
+  padding: 20px;
+}
+
+.option {
+  padding: 16px;
+  margin: 8px 0;
+  background: #f8fafc;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.option:hover {
+  background: #f0f9ff;
+  transform: translateX(8px);
+  border-color: #6366f1;
+}
+
+.question-text {
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 20px 0;
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.score-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 12px solid #eab308;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 700;
+  margin: 20px auto;
+  animation: popIn 0.8s ease;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.3); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Кнопки прививок */
+.btn-vaccine {
+  transition: all 0.3s;
+}
+
+.btn-vaccine:active {
+  transform: scale(0.95);
+}
