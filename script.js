@@ -1,4 +1,3 @@
-// ================== FIREBASE ==================
 const firebaseConfig = {
   apiKey: "AIzaSyDDuEf9tOaOz5ekzunSSgaxSvxXOTiZa2k",
   authDomain: "klesh-test.firebaseapp.com",
@@ -11,23 +10,20 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ================== ВОПРОСЫ ==================
 const questions = [
   { q: "Что является основным переносчиком клещевого энцефалита?", options: ["Комары", "Клещи", "Мухи", "Блохи"], correct: 1 },
   { q: "В какое время года наиболее активны клещи?", options: ["Зима", "Весна и осень", "Только лето", "Круглый год"], correct: 1 },
-  { q: "Можно ли заразиться через сырое молоко?", options: ["Нет", "Да", "Только через укус", "Только воздушно-капельным"], correct: 1 },
-  { q: "Как правильно удалять присосавшегося клеща?", options: ["По часовой стрелке", "Против часовой стрелки", "Сдавливать", "Прижигать"], correct: 1 },
+  { q: "Можно ли заразиться через сырое молоко?", options: ["Нет", "Да", "Только через укус", "Через воздух"], correct: 1 },
+  { q: "Как правильно удалять клеща?", options: ["По часовой стрелке", "Против часовой стрелки", "Сдавливать", "Прижигать"], correct: 1 },
   { q: "Существует ли вакцина от клещевого энцефалита?", options: ["Нет", "Да", "Только для детей", "Только для пожилых"], correct: 1 },
-  { q: "Что делать сразу после укуса клеща?", options: ["Ничего", "Удалить и обработать рану", "Пить антибиотики", "Наложить масло"], correct: 1 },
-  { q: "Какой цвет одежды лучше защищает от клещей?", options: ["Чёрный", "Светлый", "Красный", "Зелёный"], correct: 1 },
-  { q: "Можно ли использовать масло для удаления клеща?", options: ["Да", "Нет, это опасно", "Только спирт", "Только масло"], correct: 1 },
+  { q: "Что делать сразу после укуса?", options: ["Ничего", "Удалить и обработать", "Пить антибиотики", "Наложить масло"], correct: 1 },
+  { q: "Какой цвет одежды лучше защищает?", options: ["Чёрный", "Светлый", "Красный", "Зелёный"], correct: 1 },
+  { q: "Можно ли использовать масло при удалении клеща?", options: ["Да", "Нет, опасно", "Только спирт", "Только масло"], correct: 1 },
   { q: "Сколько длится инкубационный период?", options: ["1-3 дня", "7-14 дней", "1 месяц", "3 месяца"], correct: 1 },
-  { q: "Что является самым надёжным методом защиты?", options: ["Репелленты", "Вакцина + защита от укусов", "Только осмотр", "Антибиотики"], correct: 1 }
+  { q: "Самый надёжный метод защиты?", options: ["Репелленты", "Вакцина + защита", "Только осмотр", "Антибиотики"], correct: 1 }
 ];
 
 let currentQ = 0, score = 0, userName = "", answers = [];
-
-// ... (остальные функции saveResultToFirebase, showAllResults, loginAdmin — как раньше)
 
 async function saveResultToFirebase(percent) {
   try {
@@ -49,10 +45,10 @@ async function showAllResults() {
     let html = `<p style="margin-bottom:15px; font-weight:600;">Всего прохождений: ${snapshot.size}</p>`;
     snapshot.forEach(doc => {
       const r = doc.data();
-      html += `<div style="padding:14px; background:#f8fafc; border-radius:14px; margin-bottom:10px; display:flex; justify-content:space-between;">
-                 <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
-                 <span style="font-size:26px; font-weight:700; color:#10b981;">${r.score}%</span>
-               </div>`;
+      html += `<div style="padding:16px; background:#f8fafc; border-radius:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
+        <span style="font-size:26px; font-weight:700; color:#6366f1;">${r.score}%</span>
+      </div>`;
     });
     container.innerHTML = html || '<p>Пока нет результатов</p>';
   } catch (e) {
@@ -70,14 +66,12 @@ function loginAdmin() {
   }
 }
 
-// ================== ОСНОВНЫЕ ФУНКЦИИ ==================
 function startQuiz() {
   userName = document.getElementById('userName').value.trim();
   if (!userName) return alert("Введите имя!");
 
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('quizScreen').classList.remove('hidden');
-  
   currentQ = 0;
   answers = [];
   showQuestion();
@@ -129,12 +123,12 @@ async function showResult() {
 
   const circle = document.getElementById('scoreCircle');
   circle.textContent = percent + '%';
-  circle.style.borderColor = percent >= 80 ? '#10b981' : '#eab308';
+  circle.style.borderColor = percent >= 80 ? '#22c55e' : '#eab308';
 
   document.getElementById('resultMsg').innerHTML = percent >= 80 
     ? 'Отличный результат! 🏆' 
     : 'Есть над чем поработать 📚';
-  
+
   await saveResultToFirebase(percent);
 }
 
