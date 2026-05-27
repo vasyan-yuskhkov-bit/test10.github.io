@@ -27,8 +27,21 @@ const questions = [
 
 let currentQ = 0, score = 0, userName = "", answers = [];
 
-// ================== ПЕРВЫЙ ВОПРОС О ПРИВИВКЕ ==================
+// ================== СТАТИЧЕСКИЙ ОПРОС О ПРИВИВКЕ ==================
+let hasVoted = false;
+
 async function answerVaccine(yes) {
+  if (hasVoted) return;
+
+  hasVoted = true;
+
+  // Блокируем кнопки
+  document.getElementById('btnYes').disabled = true;
+  document.getElementById('btnNo').disabled = true;
+
+  // Показываем спасибо
+  document.getElementById('vaccineThankYou').classList.remove('hidden');
+
   try {
     await db.collection("vaccineStats").add({
       vaccinated: yes,
@@ -36,8 +49,6 @@ async function answerVaccine(yes) {
     });
   } catch (e) {}
 
-  document.getElementById('vaccineScreen').classList.add('hidden');
-  document.getElementById('startScreen').classList.remove('hidden');
   loadVaccineStats();
 }
 
@@ -57,7 +68,8 @@ async function loadVaccineStats() {
 
     statsEl.innerHTML = `
       <strong>Статистика прививок:</strong><br>
-      ✅ Да — ${yesPercent}% &nbsp;&nbsp; ❌ Нет — ${noPercent}%
+      ✅ Да — ${yesPercent}% (${yesCount} чел.) &nbsp;&nbsp; 
+      ❌ Нет — ${noPercent}% (${total - yesCount} чел.)
     `;
   } catch (e) {
     statsEl.textContent = "Статистика прививок загружается...";
