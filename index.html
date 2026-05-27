@@ -12,7 +12,6 @@
 
   <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
       <div class="tick-container">🪳</div>
       <h1>Клещевой энцефалит</h1>
@@ -20,8 +19,18 @@
       <div id="weather" class="weather">🌡️ Загрузка погоды...</div>
     </div>
 
+    <!-- ВОПРОС О ПРИВИВКЕ -->
+    <div id="vaccineScreen" class="card">
+      <h2>Вы прививаетесь от клещевого энцефалита?</h2>
+      <div class="options-vaccine">
+        <button onclick="answerVaccine(true)" class="btn-vaccine yes">Да</button>
+        <button onclick="answerVaccine(false)" class="btn-vaccine no">Нет</button>
+      </div>
+      <div id="vaccineStats" class="stats">Загрузка статистики...</div>
+    </div>
+
     <!-- START -->
-    <div id="startScreen" class="card">
+    <div id="startScreen" class="card hidden">
       <h2>Медицинский тест</h2>
       <input type="text" id="userName" placeholder="Введите ваше имя" class="input-name">
       <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
@@ -29,7 +38,6 @@
 
     <!-- QUIZ -->
     <div id="quizScreen" class="card hidden">
-      <div class="timer">⏱️ <span id="timeLeft">8:00</span></div>
       <h2>Вопрос <span id="qNum">1</span>/10</h2>
       <p id="questionText" class="question-text"></p>
       <div id="options"></div>
@@ -41,13 +49,19 @@
       <h2>Результат для <span id="resultUser"></span></h2>
       <div id="scoreCircle" class="score-circle">0%</div>
       <p id="resultMsg" class="result-msg"></p>
-
-      <div id="funFacts" class="facts-card">
-        <h3>🧠 Интересные факты</h3>
-        <div id="factsContent"></div>
-      </div>
-
       <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
+    </div>
+
+    <!-- ИНТЕРЕСНЫЕ ФАКТЫ -->
+    <div class="card">
+      <h2>🧠 Интересные факты о клещах</h2>
+      <div class="facts-list">
+        <p>• Клещи могут жить без еды до 3 лет</p>
+        <p>• Самый опасный период — май и июнь</p>
+        <p>• Клещ чувствует тепло тела человека с 10 метров</p>
+        <p>• Вакцинация защищает на 95–98%</p>
+        <p>• После укуса рекомендуется сдать кровь через 10–14 дней</p>
+      </div>
     </div>
 
     <!-- ПАМЯТКА -->
