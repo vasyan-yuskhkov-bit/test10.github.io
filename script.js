@@ -35,11 +35,8 @@ async function answerVaccine(yes) {
 
   hasVoted = true;
 
-  // Блокируем кнопки
   document.getElementById('btnYes').disabled = true;
   document.getElementById('btnNo').disabled = true;
-
-  // Показываем спасибо
   document.getElementById('vaccineThankYou').classList.remove('hidden');
 
   try {
@@ -72,7 +69,7 @@ async function loadVaccineStats() {
       ❌ Нет — ${noPercent}% (${total - yesCount} чел.)
     `;
   } catch (e) {
-    statsEl.textContent = "Статистика прививок загружается...";
+    statsEl.textContent = "Ошибка загрузки статистики";
   }
 }
 
