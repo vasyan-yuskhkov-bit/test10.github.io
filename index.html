@@ -17,40 +17,56 @@
       <p>Тест знаний и защита здоровья</p>
     </div>
 
-    <!-- START SCREEN -->
+    <!-- START -->
     <div id="startScreen" class="card">
-      <h2>Тест: Клещевой энцефалит</h2>
+      <h2>Пройти тест</h2>
       <input type="text" id="userName" class="input" placeholder="Введите ваше имя" style="width:100%; padding:18px; border:2px solid #e0f2f1; border-radius:16px; font-size:18px; margin:20px 0;">
-      <button onclick="startQuiz()" class="btn btn-primary">Начать тест →</button>
+      <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
     </div>
 
-    <!-- QUIZ SCREEN -->
+    <!-- QUIZ -->
     <div id="quizScreen" class="card hidden">
       <h2>Вопрос <span id="qNum">1</span>/10</h2>
-      <p id="questionText" style="font-size:19px; margin:25px 0; color:#1e2937; line-height:1.5;"></p>
+      <p id="questionText"></p>
       <div id="options"></div>
       <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary hidden">Далее →</button>
     </div>
 
-    <!-- RESULT SCREEN -->
+    <!-- RESULT -->
     <div id="resultScreen" class="card hidden">
-      <h2>Результат для <span id="resultUser" style="color:#10b981;"></span></h2>
+      <h2>Результат для <span id="resultUser"></span></h2>
       <div id="scoreCircle" class="score-circle">0%</div>
-      <p id="resultMsg" style="text-align:center; font-size:22px; margin:20px 0;"></p>
+      <p id="resultMsg" style="text-align:center; font-size:23px; margin:20px 0;"></p>
       <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
+    </div>
+
+    <!-- ПАМЯТКА -->
+    <div class="memo-card card">
+      <h2>📌 Памятка: Защита от клещей</h2>
+      <div class="memo">
+        <h3>🛡️ Профилактика</h3>
+        <ul>
+          <li>Носите светлую закрытую одежду</li>
+          <li>Обрабатывайте одежду и кожу репеллентами</li>
+          <li>Делайте тщательный осмотр после прогулки</li>
+        </ul>
+        
+        <h3>🔧 Правильное удаление клеща</h3>
+        <ul>
+          <li>Используйте пинцет или специальное устройство</li>
+          <li>Выкручивайте против часовой стрелки</li>
+          <li><strong>Не используйте масло, спирт или крем!</strong></li>
+        </ul>
+      </div>
     </div>
 
     <!-- ADMIN PANEL -->
     <div id="adminPanel">
       <div class="admin-header">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span class="emoji-3d">🔐</span>
-          <strong>Админ-панель</strong>
-        </div>
-        <button onclick="loginAdmin()" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer;">Войти</button>
+        <strong>🔐 Админ-панель</strong>
+        <button onclick="loginAdmin()" style="background:#ef4444; color:white; border:none; padding:10px 18px; border-radius:12px; cursor:pointer;">Войти</button>
       </div>
       <div id="adminContent" class="admin-content hidden">
-        <button onclick="exportToCSV()" class="btn" style="background:#10b981; margin-bottom:20px;">📥 Экспорт в CSV</button>
         <div id="adminResults">Загрузка результатов...</div>
       </div>
     </div>
