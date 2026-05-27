@@ -14,20 +14,21 @@ const db = firebase.firestore();
 // ================== ВОПРОСЫ ==================
 const questions = [
   { q: "Что является основным переносчиком клещевого энцефалита?", options: ["Комары", "Клещи", "Мухи", "Блохи"], correct: 1 },
-  { q: "В какое время года наиболее опасны клещи?", options: ["Зима", "Весна и осень", "Только лето", "Круглый год одинаково"], correct: 1 },
-  { q: "Можно ли заразиться через молоко?", options: ["Нет", "Да, через сырое козье или коровье молоко", "Только через укус", "Через воздух"], correct: 1 },
-  { q: "Как правильно удалять клеща?", options: ["Выкручивать по часовой", "Выкручивать против часовой стрелки", "Сдавливать", "Прижигать"], correct: 1 },
-  { q: "Существует ли прививка от клещевого энцефалита?", options: ["Нет", "Да", "Только для детей", "Только для взрослых"], correct: 1 },
-  { q: "Что нельзя делать при укусе клеща?", options: ["Удалять пинцетом", "Капать масло", "Обрабатывать антисептиком", "Обратиться к врачу"], correct: 1 },
-  { q: "Какой цвет одежды лучше защищает от клещей?", options: ["Тёмный", "Светлый", "Красный", "Не имеет значения"], correct: 1 },
-  { q: "Сколько примерно длится инкубационный период?", options: ["1-2 дня", "7-14 дней", "1 месяц", "3 месяца"], correct: 1 },
-  { q: "Что является самым эффективным методом защиты?", options: ["Только репелленты", "Вакцинация + защита от укусов", "Только осмотр", "Антибиотики"], correct: 1 },
-  { q: "Куда нужно обращаться после укуса клеща?", options: ["В аптеку", "К инфекционисту или в травмпункт", "Домой", "В поликлинику через неделю"], correct: 1 }
+  { q: "В какое время года наиболее активны клещи?", options: ["Зима", "Весна и осень", "Только лето", "Круглый год"], correct: 1 },
+  { q: "Можно ли заразиться через сырое молоко?", options: ["Нет", "Да", "Только через укус", "Только воздушно-капельным"], correct: 1 },
+  { q: "Как правильно удалять присосавшегося клеща?", options: ["По часовой стрелке", "Против часовой стрелки", "Сдавливать", "Прижигать"], correct: 1 },
+  { q: "Существует ли вакцина от клещевого энцефалита?", options: ["Нет", "Да", "Только для детей", "Только для пожилых"], correct: 1 },
+  { q: "Что делать сразу после укуса клеща?", options: ["Ничего", "Удалить и обработать рану", "Пить антибиотики", "Наложить масло"], correct: 1 },
+  { q: "Какой цвет одежды лучше защищает от клещей?", options: ["Чёрный", "Светлый", "Красный", "Зелёный"], correct: 1 },
+  { q: "Можно ли использовать масло для удаления клеща?", options: ["Да", "Нет, это опасно", "Только спирт", "Только масло"], correct: 1 },
+  { q: "Сколько длится инкубационный период?", options: ["1-3 дня", "7-14 дней", "1 месяц", "3 месяца"], correct: 1 },
+  { q: "Что является самым надёжным методом защиты?", options: ["Репелленты", "Вакцина + защита от укусов", "Только осмотр", "Антибиотики"], correct: 1 }
 ];
 
 let currentQ = 0, score = 0, userName = "", answers = [];
 
-// ================== ФУНКЦИИ ==================
+// ... (остальные функции saveResultToFirebase, showAllResults, loginAdmin — как раньше)
+
 async function saveResultToFirebase(percent) {
   try {
     await db.collection("testResults").add({
@@ -43,29 +44,24 @@ async function saveResultToFirebase(percent) {
 async function showAllResults() {
   const container = document.getElementById('adminResults');
   container.innerHTML = '<p>Загрузка...</p>';
-
   try {
     const snapshot = await db.collection("testResults").orderBy("timestamp", "desc").get();
     let html = `<p style="margin-bottom:15px; font-weight:600;">Всего прохождений: ${snapshot.size}</p>`;
-
     snapshot.forEach(doc => {
       const r = doc.data();
-      const docId = doc.id;
-      html += `
-        <div class="result-item">
-          <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
-          <span style="font-size:24px; font-weight:700; color:#10b981;">${r.score}%</span>
-        </div>`;
+      html += `<div style="padding:14px; background:#f8fafc; border-radius:14px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                 <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
+                 <span style="font-size:26px; font-weight:700; color:#10b981;">${r.score}%</span>
+               </div>`;
     });
-
-    container.innerHTML = html || '<p>Результатов пока нет</p>';
+    container.innerHTML = html || '<p>Пока нет результатов</p>';
   } catch (e) {
     container.innerHTML = '<p>Ошибка загрузки</p>';
   }
 }
 
 function loginAdmin() {
-  const pass = prompt("Введите пароль:");
+  const pass = prompt("Введите пароль администратора:");
   if (pass === "sofr2928") {
     document.getElementById('adminContent').classList.remove('hidden');
     showAllResults();
@@ -74,13 +70,14 @@ function loginAdmin() {
   }
 }
 
-// ================== ТЕСТ ==================
+// ================== ОСНОВНЫЕ ФУНКЦИИ ==================
 function startQuiz() {
   userName = document.getElementById('userName').value.trim();
   if (!userName) return alert("Введите имя!");
 
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('quizScreen').classList.remove('hidden');
+  
   currentQ = 0;
   answers = [];
   showQuestion();
@@ -136,8 +133,8 @@ async function showResult() {
 
   document.getElementById('resultMsg').innerHTML = percent >= 80 
     ? 'Отличный результат! 🏆' 
-    : 'Хорошая попытка! Есть над чем поработать 📚';
-
+    : 'Есть над чем поработать 📚';
+  
   await saveResultToFirebase(percent);
 }
 
