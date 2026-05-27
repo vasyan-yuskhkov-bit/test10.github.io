@@ -12,12 +12,62 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ================== ВОПРОСЫ ==================
-const questions = [ /* твои 10 вопросов */ ];
+const questions = [
+  {
+    q: "Что является переносчиком клещевого энцефалита?",
+    options: ["Комары", "Клещи", "Мухи", "Блохи"],
+    correct: 1
+  },
+  {
+    q: "В какое время года наиболее активны клещи?",
+    options: ["Зима", "Весна и осень", "Только лето", "Круглый год"],
+    correct: 1
+  },
+  {
+    q: "Можно ли заразиться клещевым энцефалитом через молоко?",
+    options: ["Нет", "Да, через сырое козье/коровье молоко", "Только через укус", "Только воздушно-капельным путём"],
+    correct: 1
+  },
+  {
+    q: "Какой метод удаления клеща правильный?",
+    options: ["Выкручивать по часовой стрелке", "Выкручивать против часовой стрелки", "Сдавливать пальцами", "Прижигать"],
+    correct: 1
+  },
+  {
+    q: "Существует ли вакцина от клещевого энцефалита?",
+    options: ["Нет", "Да", "Только для детей", "Только для пожилых"],
+    correct: 1
+  },
+  {
+    q: "Что делать сразу после укуса клеща?",
+    options: ["Ничего не делать", "Удалить клеща и обработать место", "Сразу пить антибиотики", "Наложить повязку с маслом"],
+    correct: 1
+  },
+  {
+    q: "Какой цвет одежды лучше всего защищает от клещей?",
+    options: ["Чёрный", "Светлый (белый, бежевый)", "Красный", "Зелёный"],
+    correct: 1
+  },
+  {
+    q: "Можно ли использовать масло или спирт для удаления клеща?",
+    options: ["Да", "Нет, это опасно", "Только спирт", "Только масло"],
+    correct: 1
+  },
+  {
+    q: "Сколько дней обычно длится инкубационный период клещевого энцефалита?",
+    options: ["1–3 дня", "7–14 дней", "1 месяц", "3 месяца"],
+    correct: 1
+  },
+  {
+    q: "Что является самым надёжным методом профилактики?",
+    options: ["Репелленты", "Вакцинация + защита от укусов", "Только осмотр", "Антибиотики"],
+    correct: 1
+  }
+];
 
 let currentQ = 0, score = 0, userName = "", answers = [];
 
-// ... (все функции saveResultToFirebase, showAllResults и т.д. как раньше)
-
+// ================== ФУНКЦИИ ==================
 async function saveResultToFirebase(percent) {
   try {
     await db.collection("testResults").add({
@@ -27,7 +77,7 @@ async function saveResultToFirebase(percent) {
       correct: score,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-  } catch (e) {}
+  } catch (e) { console.error(e); }
 }
 
 async function showAllResults() {
@@ -40,20 +90,39 @@ async function showAllResults() {
 
     snapshot.forEach(doc => {
       const r = doc.data();
+      const docId = doc.id;
       html += `
-        <div class="result-item">
-          <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
-          <span class="font-bold text-emerald-600">${r.score}%</span>
+        <div class="result-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee;">
+          <div>
+            <strong>${r.name}</strong><br>
+            <small>${r.date}</small>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="font-bold text-emerald-600">${r.score}%</span>
+            <button onclick="deleteResult('${docId}')" style="background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:8px; cursor:pointer;">🗑️</button>
+          </div>
         </div>`;
     });
 
     container.innerHTML = html || '<p>Пока нет результатов</p>';
   } catch (e) {
-    container.innerHTML = '<p>Ошибка загрузки</p>';
+    container.innerHTML = '<p>Ошибка загрузки результатов</p>';
   }
 }
 
-// Показ админ-панели
+function deleteResult(docId) {
+  if (confirm("Удалить этот результат?")) {
+    db.collection("testResults").doc(docId).delete().then(() => {
+      showAllResults();
+    });
+  }
+}
+
+function exportToCSV() {
+  alert("Экспорт в CSV будет добавлен в следующей версии.\nПока можно скопировать результаты вручную.");
+  // Полноценный экспорт можно сделать позже
+}
+
 function showAdminPanel() {
   document.getElementById('resultScreen').classList.add('hidden');
   const pass = prompt("Введите пароль администратора:");
@@ -66,7 +135,12 @@ function showAdminPanel() {
   }
 }
 
-// Остальные функции (startQuiz, showQuestion, showResult и т.д.)
+function hideAdminPanel() {
+  document.getElementById('adminContent').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+}
+
+// ================== ОСНОВНЫЕ ФУНКЦИИ ТЕСТА ==================
 function startQuiz() {
   userName = document.getElementById('userName').value.trim();
   if (!userName) return alert("Введите имя!");
