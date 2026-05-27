@@ -12,24 +12,21 @@
 
   <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
       <div class="tick-container">
         <span class="tick-emoji">🪳</span>
       </div>
       <h1>Клещевой энцефалит</h1>
       <p>Тест знаний и защита здоровья</p>
-      <div id="weather" class="weather">🌡️ Загрузка погоды...</div>
+      <div id="weather" class="weather">🌡️ Загрузка погоды в Дивногорске...</div>
     </div>
 
-    <!-- START -->
     <div id="startScreen" class="card">
       <h2>Медицинский тест</h2>
       <input type="text" id="userName" placeholder="Введите ваше имя" class="input">
       <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
     </div>
 
-    <!-- QUIZ -->
     <div id="quizScreen" class="card hidden">
       <div class="timer">⏱️ <span id="timeLeft">8:00</span></div>
       <h2>Вопрос <span id="qNum">1</span>/10</h2>
@@ -38,13 +35,12 @@
       <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary hidden">Далее →</button>
     </div>
 
-    <!-- RESULT -->
     <div id="resultScreen" class="card hidden">
       <h2>Результат для <span id="resultUser"></span></h2>
       <div id="scoreCircle" class="score-circle">0%</div>
       <p id="resultMsg" class="result-msg"></p>
-      
-      <div id="funFacts" class="facts-card hidden">
+
+      <div id="funFacts" class="facts-card">
         <h3>🧠 Интересные факты о клещах</h3>
         <div id="factsContent"></div>
       </div>
@@ -52,10 +48,23 @@
       <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
     </div>
 
-    <!-- Памятка + Регионы -->
+    <!-- ПАМЯТКА -->
     <div class="memo-card card">
       <h2>📌 Памятка: Защита от клещей</h2>
-      <!-- ... (оставил как было) -->
+      <div class="memo">
+        <h3>🛡️ Профилактика</h3>
+        <ul>
+          <li>Носите светлую закрытую одежду</li>
+          <li>Обрабатывайте одежду репеллентами</li>
+          <li>Делайте тщательный осмотр после прогулки</li>
+        </ul>
+        <h3>🔧 Удаление клеща</h3>
+        <ul>
+          <li>Используйте пинцет</li>
+          <li>Выкручивайте против часовой стрелки</li>
+          <li><strong>Не используйте масло и спирт!</strong></li>
+        </ul>
+      </div>
     </div>
 
     <div class="card">
@@ -66,8 +75,8 @@
 
     <!-- ЛИДЕРБОРД -->
     <div class="card leaderboard-card">
-      <h2>🏆 Кто лучше всех прошёл тест</h2>
-      <div id="leaderboard">Загрузка лидеров...</div>
+      <h2>🏆 Лучшие результаты</h2>
+      <div id="leaderboard">Загрузка...</div>
     </div>
 
     <!-- ADMIN -->
@@ -77,7 +86,7 @@
         <button onclick="loginAdmin()" class="admin-btn">Войти</button>
       </div>
       <div id="adminContent" class="hidden admin-content">
-        <div id="adminResults">Загрузка...</div>
+        <div id="adminResults">Загрузка результатов...</div>
       </div>
     </div>
 
