@@ -31,8 +31,8 @@ let hasVoted = false;
 // ================== ОПРОС О ПРИВИВКЕ ==================
 async function answerVaccine(yes) {
   if (hasVoted) return;
-  
   hasVoted = true;
+
   document.getElementById('btnYes').disabled = true;
   document.getElementById('btnNo').disabled = true;
   document.getElementById('vaccineThankYou').classList.remove('hidden');
@@ -63,8 +63,7 @@ async function loadVaccineStats() {
 
     statsEl.innerHTML = `
       <strong>Статистика прививок:</strong><br>
-      ✅ Да — ${yesPercent}% (${yesCount} чел.) &nbsp;&nbsp; 
-      ❌ Нет — ${noPercent}% (${total - yesCount} чел.)
+      ✅ Да — ${yesPercent}% &nbsp;&nbsp; ❌ Нет — ${noPercent}%
     `;
   } catch (e) {
     statsEl.textContent = "Статистика прививок загружается...";
@@ -177,10 +176,9 @@ async function saveResultToFirebase(percent) {
 function startTest() {
   userName = document.getElementById('userName').value.trim();
   if (!userName) {
-    alert("Пожалуйста, введите ваше имя!");
+    alert("Введите ваше имя!");
     return;
   }
-
   currentQ = 0;
   answers = [];
   showQuestion();
@@ -228,7 +226,7 @@ async function showResult() {
   });
 
   const percent = Math.round((score / 10) * 100);
-  document.getElementById('resultUser').textContent = userName || "Аноним";
+  document.getElementById('resultUser').textContent = userName;
 
   const circle = document.getElementById('scoreCircle');
   circle.textContent = percent + '%';
@@ -251,5 +249,5 @@ window.onload = () => {
   loadWeather();
   loadLeaderboard();
   loadVaccineStats();
-  startTest(); // Автозапуск теста (имя нужно будет ввести)
+  // Тест запускается вручную после ввода имени
 };
