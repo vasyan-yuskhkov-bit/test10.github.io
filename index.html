@@ -10,20 +10,13 @@
 </head>
 <body>
 
-  <!-- Левое боковое фото (Медицина + клещ) -->
-  <div class="side-image left" id="leftImage">
-    <img src="https://source.unsplash.com/600x800/?tick,medical" alt="Клещ и медицина">
-  </div>
-
-  <!-- Правое боковое фото (Клещ крупно) -->
-  <div class="side-image right" id="rightImage">
-    <img src="https://source.unsplash.com/600x800/?tick,insect" alt="Клещ">
-  </div>
-
   <div class="container">
 
     <div class="header">
-      <h1>🧠 Клещевой энцефалит</h1>
+      <div class="tick-container">
+        <span class="tick-emoji">🪳</span>
+      </div>
+      <h1>Клещевой энцефалит</h1>
       <p>Тест знаний и защита здоровья</p>
     </div>
 
@@ -84,17 +77,5 @@
   </div>
 
   <script src="script.js"></script>
-
-  <!-- Parallax -->
-  <script>
-    const leftImage = document.getElementById('leftImage');
-    const rightImage = document.getElementById('rightImage');
-
-    window.addEventListener('scroll', () => {
-      const scrollY = window.scrollY * 0.12;
-      leftImage.style.transform = `translateY(calc(-50% + ${scrollY}px)) rotate(-12deg) rotateY(-15deg)`;
-      rightImage.style.transform = `translateY(calc(-50% + ${-scrollY * 0.9}px)) rotate(12deg) rotateY(15deg)`;
-    });
-  </script>
 </body>
 </html>
