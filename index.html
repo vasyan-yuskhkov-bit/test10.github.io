@@ -19,7 +19,7 @@
       <div id="weather" class="weather">🌡️ Загрузка погоды...</div>
     </div>
 
-    <!-- ОПРОС О ПРИВИВКЕ -->
+    <!-- ОПРОС О ПРИВИВКЕ (остаётся всегда) -->
     <div id="vaccineScreen" class="card">
       <h2>Вы прививаетесь от клещевого энцефалита?</h2>
       <div class="options-vaccine">
@@ -34,14 +34,14 @@
     <div id="startScreen" class="card">
       <h2>Медицинский тест</h2>
       <input type="text" id="userName" placeholder="Введите ваше имя" class="input-name">
-      <button onclick="startQuiz()" class="btn btn-primary start-btn">🚀 Начать тест</button>
+      <button onclick="startQuiz()" class="btn btn-primary">🚀 Начать тест</button>
     </div>
 
     <!-- ВОПРОСЫ -->
     <div id="quizScreen" class="card hidden">
       <h2>Вопрос <span id="qNum">1</span>/10</h2>
       <p id="questionText" class="question-text"></p>
-      <div id="options" class="options"></div>
+      <div id="options"></div>
       <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary hidden">Далее →</button>
     </div>
 
@@ -53,9 +53,7 @@
       <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
     </div>
 
-    <!-- Остальные блоки (факты, памятка и т.д.) остались без изменений -->
-    <!-- ... (факты, памятка, регионы, лидерборд, админ) ... -->
-
+    <!-- Остальные блоки -->
     <div class="card">
       <h2>🧠 Интересные факты о клещах</h2>
       <div class="facts-list">
