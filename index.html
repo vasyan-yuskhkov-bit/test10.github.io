@@ -30,15 +30,14 @@
       <div id="vaccineStats" class="stats">Загрузка статистики...</div>
     </div>
 
-    <!-- START -->
-    <div id="startScreen" class="card hidden">
+    <!-- ТЕСТ (сразу ниже) -->
+    <div id="quizScreen" class="card">
       <h2>Медицинский тест</h2>
-      <input type="text" id="userName" placeholder="Введите ваше имя" class="input-name">
-      <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
-    </div>
+      
+      <div style="margin-bottom: 20px;">
+        <input type="text" id="userName" placeholder="Введите ваше имя" class="input-name" style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; font-size:16px;">
+      </div>
 
-    <!-- QUIZ -->
-    <div id="quizScreen" class="card hidden">
       <h2>Вопрос <span id="qNum">1</span>/10</h2>
       <p id="questionText" class="question-text"></p>
       <div id="options"></div>
