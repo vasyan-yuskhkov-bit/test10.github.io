@@ -20,64 +20,38 @@
     <!-- START SCREEN -->
     <div id="startScreen" class="card">
       <h2>Тест: Клещевой энцефалит</h2>
-      <input type="text" id="userName" class="input" placeholder="Ваше имя" required>
-      <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
+      <input type="text" id="userName" class="input" placeholder="Введите ваше имя" style="width:100%; padding:18px; border:2px solid #e0f2f1; border-radius:16px; font-size:18px; margin:20px 0;">
+      <button onclick="startQuiz()" class="btn btn-primary">Начать тест →</button>
     </div>
 
     <!-- QUIZ SCREEN -->
     <div id="quizScreen" class="card hidden">
       <h2>Вопрос <span id="qNum">1</span>/10</h2>
-      <p id="questionText" style="font-size:18px; margin-bottom:20px;"></p>
-      
-      <div id="options" class="options"></div>
-      
+      <p id="questionText" style="font-size:19px; margin:25px 0; color:#1e2937; line-height:1.5;"></p>
+      <div id="options"></div>
       <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary hidden">Далее →</button>
-      <div id="quizUser" style="margin-top:15px; text-align:center; font-weight:600;"></div>
     </div>
 
     <!-- RESULT SCREEN -->
     <div id="resultScreen" class="card hidden">
-      <h2>Результат для <span id="resultUser"></span></h2>
-      
+      <h2>Результат для <span id="resultUser" style="color:#10b981;"></span></h2>
       <div id="scoreCircle" class="score-circle">0%</div>
-      
-      <p id="resultMsg" style="text-align:center; font-size:20px; margin:15px 0;"></p>
-      
+      <p id="resultMsg" style="text-align:center; font-size:22px; margin:20px 0;"></p>
       <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
-      <button onclick="showAdminPanel()" class="btn" style="background:#64748b; margin-top:10px;">👨‍💼 Админ-панель</button>
     </div>
 
     <!-- ADMIN PANEL -->
-    <div id="adminContent" class="card hidden">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2>👨‍💼 Админ-панель</h2>
-        <button onclick="hideAdminPanel()" class="btn" style="background:#ef4444; width:auto; padding:10px 20px;">✕ Закрыть</button>
+    <div id="adminPanel">
+      <div class="admin-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="emoji-3d">🔐</span>
+          <strong>Админ-панель</strong>
+        </div>
+        <button onclick="loginAdmin()" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:12px; cursor:pointer;">Войти</button>
       </div>
-      
-      <button onclick="exportToCSV()" class="btn" style="background:#10b981; margin-bottom:15px;">📊 Экспорт в CSV</button>
-      
-      <div id="adminResults">
-        <p>Загрузка результатов...</p>
-      </div>
-    </div>
-
-    <!-- MEMO -->
-    <div class="memo-card">
-      <h2>📌 Памятка: Защита от клещей</h2>
-      <div class="memo">
-        <h3>🛡️ Профилактика</h3>
-        <ul>
-          <li>Носите светлую закрытую одежду</li>
-          <li>Обрабатывайте одежду репеллентами</li>
-          <li>Делайте осмотр после прогулки</li>
-        </ul>
-        
-        <h3>🔧 Удаление клеща</h3>
-        <ul>
-          <li>Используйте пинцет</li>
-          <li>Выкручивайте против часовой стрелки</li>
-          <li><strong>Не используйте масло!</strong></li>
-        </ul>
+      <div id="adminContent" class="admin-content hidden">
+        <button onclick="exportToCSV()" class="btn" style="background:#10b981; margin-bottom:20px;">📥 Экспорт в CSV</button>
+        <div id="adminResults">Загрузка результатов...</div>
       </div>
     </div>
 
