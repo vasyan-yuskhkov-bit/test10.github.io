@@ -62,12 +62,29 @@ body {
 .btn-vaccine.yes { background: linear-gradient(135deg, #22c55e, #4ade80); color: white; }
 .btn-vaccine.no { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
 
+.btn-vaccine:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .stats {
   text-align: center;
   font-size: 17px;
   margin-top: 15px;
   padding: 12px;
   background: #f8fafc;
+  border-radius: 12px;
+}
+
+.thank-you {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #22c55e;
+  margin: 15px 0;
+  padding: 12px;
+  background: #f0fdf4;
   border-radius: 12px;
 }
 
