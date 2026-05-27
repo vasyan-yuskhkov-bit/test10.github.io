@@ -20,24 +20,37 @@
     <!-- START -->
     <div id="startScreen" class="card">
       <h2>Пройти тест</h2>
-      <input type="text" id="userName" class="input" placeholder="Введите ваше имя" style="width:100%; padding:18px; border:2px solid #e0f2f1; border-radius:16px; font-size:18px; margin:20px 0;">
+      <input type="text" id="userName" placeholder="Введите ваше имя" style="width:100%; padding:18px; border:2px solid #e0f2f1; border-radius:16px; font-size:18px; margin:20px 0;">
       <button onclick="startQuiz()" class="btn btn-primary">Начать тест</button>
     </div>
 
     <!-- QUIZ -->
     <div id="quizScreen" class="card hidden">
       <h2>Вопрос <span id="qNum">1</span>/10</h2>
-      <p id="questionText"></p>
+      <p id="questionText" style="font-size:20px; margin-bottom:25px; line-height:1.5;"></p>
       <div id="options"></div>
       <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary hidden">Далее →</button>
     </div>
 
     <!-- RESULT -->
     <div id="resultScreen" class="card hidden">
-      <h2>Результат для <span id="resultUser"></span></h2>
+      <h2>Результат для <span id="resultUser" style="color:#10b981;"></span></h2>
       <div id="scoreCircle" class="score-circle">0%</div>
-      <p id="resultMsg" style="text-align:center; font-size:23px; margin:20px 0;"></p>
+      <p id="resultMsg" style="text-align:center; font-size:24px; margin:20px 0;"></p>
       <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
+    </div>
+
+    <!-- КАРТА ОПАСНЫХ РЕГИОНОВ -->
+    <div class="card">
+      <h2>🗺️ Карта опасных регионов</h2>
+      <p style="margin-bottom:15px; color:#334155;">Клещевой энцефалит наиболее распространён в следующих регионах России:</p>
+      <div class="map-container">
+        <img src="https://i.imgur.com/5vN8K2P.png" alt="Карта опасных регионов клещевого энцефалита">
+      </div>
+      <ul style="margin-top:15px; line-height:1.8; color:#1e2937;">
+        <li><strong>Высокий риск:</strong> Сибирь, Дальний Восток, Урал, Карелия</li>
+        <li><strong>Средний риск:</strong> Центральная Россия, Поволжье, Северо-Запад</li>
+      </ul>
     </div>
 
     <!-- ПАМЯТКА -->
@@ -46,28 +59,27 @@
       <div class="memo">
         <h3>🛡️ Профилактика</h3>
         <ul>
-          <li>Носите светлую закрытую одежду</li>
-          <li>Обрабатывайте одежду и кожу репеллентами</li>
-          <li>Делайте тщательный осмотр после прогулки</li>
+          <li>Светлая закрытая одежда</li>
+          <li>Репелленты на одежду и кожу</li>
+          <li>Осмотр тела после прогулки</li>
         </ul>
         
-        <h3>🔧 Правильное удаление клеща</h3>
+        <h3>🔧 Удаление клеща</h3>
         <ul>
-          <li>Используйте пинцет или специальное устройство</li>
-          <li>Выкручивайте против часовой стрелки</li>
-          <li><strong>Не используйте масло, спирт или крем!</strong></li>
+          <li>Пинцетом против часовой стрелки</li>
+          <li><strong>Не использовать масло и спирт!</strong></li>
         </ul>
       </div>
     </div>
 
-    <!-- ADMIN PANEL -->
-    <div id="adminPanel">
-      <div class="admin-header">
+    <!-- ADMIN -->
+    <div id="adminPanel" class="card">
+      <div class="admin-header" style="background: linear-gradient(135deg, #1e2937, #334155); color:white; padding:20px; border-radius:20px 20px 0 0;">
         <strong>🔐 Админ-панель</strong>
-        <button onclick="loginAdmin()" style="background:#ef4444; color:white; border:none; padding:10px 18px; border-radius:12px; cursor:pointer;">Войти</button>
+        <button onclick="loginAdmin()" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:12px;">Войти</button>
       </div>
-      <div id="adminContent" class="admin-content hidden">
-        <div id="adminResults">Загрузка результатов...</div>
+      <div id="adminContent" class="admin-content hidden" style="padding:25px; background:white; border-radius:0 0 20px 20px;">
+        <div id="adminResults">Загрузка...</div>
       </div>
     </div>
 
