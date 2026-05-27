@@ -1,235 +1,49 @@
-// ================== FIREBASE ==================
-const firebaseConfig = {
-  apiKey: "AIzaSyDDuEf9tOaOz5ekzunSSgaxSvxXOTiZa2k",
-  authDomain: "klesh-test.firebaseapp.com",
-  projectId: "klesh-test",
-  storageBucket: "klesh-test.firebasestorage.app",
-  messagingSenderId: "282009735770",
-  appId: "1:282009735770:web:234d7944039fd68f62fe63"
-};
+// ================== ЗВУКИ ==================
+const clickSound = new Audio('https://freesound.org/data/previews/66/66929_931655-lq.mp3');
+const successSound = new Audio('https://freesound.org/data/previews/387/387186_7258992-lq.mp3');
+const warningSound = new Audio('https://freesound.org/data/previews/276/276951_5121236-lq.mp3');
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// ================== FIREBASE + ВОПРОСЫ (оставь как было) ==================
 
-// ================== ВОПРОСЫ ==================
-const questions = [
-  { q: "Что является основным переносчиком клещевого энцефалита?", options: ["Комары", "Клещи", "Мухи", "Блохи"], correct: 1 },
-  { q: "В какое время года наиболее активны клещи?", options: ["Зима", "Весна и осень", "Только лето", "Круглый год"], correct: 1 },
-  { q: "Можно ли заразиться через сырое молоко?", options: ["Нет", "Да", "Только через укус", "Через воздух"], correct: 1 },
-  { q: "Как правильно удалять присосавшегося клеща?", options: ["По часовой стрелке", "Против часовой стрелки", "Сдавливать пальцами", "Прижигать"], correct: 1 },
-  { q: "Существует ли вакцина от клещевого энцефалита?", options: ["Нет", "Да", "Только для детей", "Только для пожилых"], correct: 1 },
-  { q: "Что делать сразу после укуса клеща?", options: ["Ничего не делать", "Удалить и обработать место", "Сразу пить антибиотики", "Наложить масло"], correct: 1 },
-  { q: "Какой цвет одежды лучше защищает от клещей?", options: ["Чёрный", "Светлый", "Красный", "Зелёный"], correct: 1 },
-  { q: "Можно ли использовать масло для удаления клеща?", options: ["Да", "Нет, это опасно", "Только спирт", "Только масло"], correct: 1 },
-  { q: "Сколько примерно длится инкубационный период?", options: ["1-3 дня", "7-14 дней", "1 месяц", "3 месяца"], correct: 1 },
-  { q: "Что является самым надёжным методом защиты?", options: ["Только репелленты", "Вакцинация + защита от укусов", "Только осмотр", "Антибиотики"], correct: 1 }
-];
+// ... (весь код Firebase и questions из предыдущей версии)
 
-let currentQ = 0, score = 0, userName = "", answers = [], timerInterval = null;
-
-// ================== ТАЙМЕР ==================
+// ================== ТАЙМЕР С ЗВУКОМ ==================
 function startTimer() {
-  let timeLeft = 480; // 8 минут
+  let timeLeft = 480;
   const timerEl = document.getElementById('timeLeft');
 
   timerInterval = setInterval(() => {
     timeLeft--;
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    const min = Math.floor(timeLeft / 60);
+    const sec = timeLeft % 60;
+    timerEl.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
 
-    if (timeLeft <= 60) {
-      timerEl.style.color = '#ef4444';
-    }
-
+    if (timeLeft === 60) warningSound.play();
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
-      alert("Время вышло! Тест завершён.");
+      alert("Время вышло!");
       showResult();
     }
   }, 1000);
 }
 
-// ================== ПОГОДА ==================
-async function loadWeather() {
-  const weatherEl = document.getElementById('weather');
-  try {
-    // Используем открытый API (погода в Дивногорске)
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.95&longitude=92.35&current_weather=true');
-    const data = await res.json();
-    const temp = Math.round(data.current_weather.temperature);
-    weatherEl.innerHTML = `🌡️ Дивногорск: <strong>${temp}°C</strong>`;
-  } catch (e) {
-    weatherEl.textContent = '🌡️ Дивногорск: погода загружается...';
-  }
-}
-
-// ================== ЛИДЕРБОРД ==================
-async function loadLeaderboard() {
-  const container = document.getElementById('leaderboard');
-  try {
-    const snapshot = await db.collection("testResults").orderBy("score", "desc").limit(5).get();
-    let html = '';
-    snapshot.forEach(doc => {
-      const r = doc.data();
-      html += `<div class="leader-item"><strong>${r.name}</strong> — ${r.score}%</div>`;
-    });
-    container.innerHTML = html || '<p>Пока нет результатов</p>';
-  } catch (e) {
-    container.innerHTML = '<p>Ошибка загрузки лидерборда</p>';
-  }
-}
-
-// ================== АДМИН ==================
-async function showAllResults() {
-  const container = document.getElementById('adminResults');
-  container.innerHTML = '<p>Загрузка...</p>';
-
-  try {
-    const snapshot = await db.collection("testResults").orderBy("timestamp", "desc").get();
-    let html = `<p style="margin-bottom:15px;">Всего прохождений: ${snapshot.size}</p>`;
-
-    snapshot.forEach(doc => {
-      const r = doc.data();
-      const docId = doc.id;
-      html += `
-        <div class="result-item">
-          <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span class="score">${r.score}%</span>
-            <button onclick="deleteResult('${docId}')" class="delete-btn">🗑️</button>
-          </div>
-        </div>`;
-    });
-
-    container.innerHTML = html || '<p>Пока нет результатов</p>';
-  } catch (e) {
-    container.innerHTML = '<p>Ошибка загрузки</p>';
-  }
-}
-
-function deleteResult(docId) {
-  if (confirm("Удалить этот результат?")) {
-    db.collection("testResults").doc(docId).delete().then(() => {
-      showAllResults();
-      loadLeaderboard();
-    });
-  }
-}
-
-function loginAdmin() {
-  const pass = prompt("Введите пароль администратора:");
-  if (pass === "sofr2928") {
-    document.getElementById('adminContent').classList.remove('hidden');
-    showAllResults();
-  } else {
-    alert("Неверный пароль!");
-  }
-}
-
-// ================== ОСНОВНЫЕ ФУНКЦИИ ТЕСТА ==================
-function startQuiz() {
-  userName = document.getElementById('userName').value.trim();
-  if (!userName) return alert("Введите имя!");
-
-  document.getElementById('startScreen').classList.add('hidden');
-  document.getElementById('quizScreen').classList.remove('hidden');
-
-  currentQ = 0;
-  answers = [];
-  startTimer();
-  showQuestion();
-}
-
-function showQuestion() {
-  const q = questions[currentQ];
-  document.getElementById('qNum').textContent = currentQ + 1;
-  document.getElementById('questionText').textContent = q.q;
-
-  const opts = document.getElementById('options');
-  opts.innerHTML = '';
-
-  q.options.forEach((text, i) => {
-    const div = document.createElement('div');
-    div.className = 'option';
-    div.innerHTML = `<input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})"> ${text}`;
-    opts.appendChild(div);
-  });
-
-  document.getElementById('nextBtn').classList.add('hidden');
-}
-
+// ================== КЛИК ПО ОТВЕТУ ==================
 function selectAnswer(index) {
   answers[currentQ] = index;
+  clickSound.play();
   document.getElementById('nextBtn').classList.remove('hidden');
 }
 
-function nextQuestion() {
-  currentQ++;
-  if (currentQ < questions.length) {
-    showQuestion();
-  } else {
-    clearInterval(timerInterval);
-    showResult();
-  }
-}
-
+// ================== ЗАВЕРШЕНИЕ ТЕСТА ==================
 async function showResult() {
   document.getElementById('quizScreen').classList.add('hidden');
   document.getElementById('resultScreen').classList.remove('hidden');
 
-  score = 0;
-  answers.forEach((ans, i) => {
-    if (ans === questions[i].correct) score++;
-  });
+  // ... (подсчёт результата)
 
-  const percent = Math.round((score / 10) * 100);
-  document.getElementById('resultUser').textContent = userName;
+  if (percent >= 80) successSound.play();
 
-  const circle = document.getElementById('scoreCircle');
-  circle.textContent = percent + '%';
-  circle.style.borderColor = percent >= 80 ? '#22c55e' : '#eab308';
-
-  document.getElementById('resultMsg').innerHTML = percent >= 80 
-    ? 'Отличный результат! 🏆' 
-    : 'Хорошая попытка! Есть над чем поработать 📚';
-
-  await saveResultToFirebase(percent);
-  loadLeaderboard();
-  showFunFacts();
-}
-
-async function saveResultToFirebase(percent) {
-  try {
-    await db.collection("testResults").add({
-      name: userName,
-      date: new Date().toLocaleString('ru-RU'),
-      score: percent,
-      correct: score,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch (e) {}
-}
-
-function showFunFacts() {
-  const facts = [
-    "Клещи могут жить без еды до 3 лет.",
-    "Самый опасный период — май и июнь.",
-    "Клещ чувствует тепло тела человека с расстояния 10 метров.",
-    "Вакцинация защищает на 95–98%.",
-    "После укуса клеща рекомендуется сдать кровь через 10–14 дней."
-  ];
-
-  let html = '';
-  facts.forEach(fact => {
-    html += `<p class="fact">• ${fact}</p>`;
-  });
-  document.getElementById('factsContent').innerHTML = html;
-}
-
-function restartQuiz() {
-  clearInterval(timerInterval);
-  location.reload();
+  // ... (остальной код showResult)
 }
 
 // ================== ЗАПУСК ==================
