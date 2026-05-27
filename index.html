@@ -19,7 +19,7 @@
       <div id="weather" class="weather">🌡️ Загрузка погоды...</div>
     </div>
 
-    <!-- ВОПРОС О ПРИВИВКЕ -->
+    <!-- ОПРОС О ПРИВИВКЕ -->
     <div id="vaccineScreen" class="card">
       <h2>Вы прививаетесь от клещевого энцефалита?</h2>
       <div class="options-vaccine">
@@ -30,17 +30,22 @@
       <div id="vaccineStats" class="stats">Загрузка статистики...</div>
     </div>
 
-    <!-- ТЕСТ СРАЗУ ПОД ОПРОСОМ -->
-    <div id="quizScreen" class="card">
+    <!-- НАЧАЛО ТЕСТА -->
+    <div id="startScreen" class="card">
       <h2>Медицинский тест</h2>
       <input type="text" id="userName" placeholder="Введите ваше имя" class="input-name">
-      <h3 style="margin: 15px 0 10px;">Вопрос <span id="qNum">1</span>/10</h3>
+      <button onclick="startQuiz()" class="btn btn-primary start-btn">🚀 Начать тест</button>
+    </div>
+
+    <!-- ВОПРОСЫ -->
+    <div id="quizScreen" class="card hidden">
+      <h2>Вопрос <span id="qNum">1</span>/10</h2>
       <p id="questionText" class="question-text"></p>
-      <div id="options"></div>
+      <div id="options" class="options"></div>
       <button id="nextBtn" onclick="nextQuestion()" class="btn btn-primary hidden">Далее →</button>
     </div>
 
-    <!-- RESULT -->
+    <!-- РЕЗУЛЬТАТ -->
     <div id="resultScreen" class="card hidden">
       <h2>Результат для <span id="resultUser"></span></h2>
       <div id="scoreCircle" class="score-circle">0%</div>
@@ -48,7 +53,9 @@
       <button onclick="restartQuiz()" class="btn btn-primary">Пройти заново</button>
     </div>
 
-    <!-- ИНТЕРЕСНЫЕ ФАКТЫ -->
+    <!-- Остальные блоки (факты, памятка и т.д.) остались без изменений -->
+    <!-- ... (факты, памятка, регионы, лидерборд, админ) ... -->
+
     <div class="card">
       <h2>🧠 Интересные факты о клещах</h2>
       <div class="facts-list">
@@ -60,7 +67,6 @@
       </div>
     </div>
 
-    <!-- ПАМЯТКА -->
     <div class="memo-card card">
       <h2>📌 Памятка: Защита от клещей</h2>
       <div class="memo-grid">
@@ -85,20 +91,17 @@
       </div>
     </div>
 
-    <!-- РЕГИОНЫ -->
     <div class="card">
       <h2>🗺️ Опасные регионы</h2>
       <p><strong style="color:#ef4444;">🔴 Высокий риск:</strong> Сибирь, Дальний Восток, Урал, Карелия</p>
       <p><strong style="color:#eab308;">🟡 Средний риск:</strong> Центральная Россия, Поволжье, Северо-Запад</p>
     </div>
 
-    <!-- ЛИДЕРБОРД -->
     <div class="card leaderboard-card">
       <h2>🏆 Топ-3 лучших результата</h2>
       <div id="leaderboard">Загрузка...</div>
     </div>
 
-    <!-- ADMIN -->
     <div id="adminPanel" class="card">
       <div class="admin-header">
         <strong>🔐 Админ-панель</strong>
