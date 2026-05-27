@@ -23,9 +23,10 @@
     <div id="vaccineScreen" class="card">
       <h2>Вы прививаетесь от клещевого энцефалита?</h2>
       <div class="options-vaccine">
-        <button onclick="answerVaccine(true)" class="btn-vaccine yes">Да</button>
-        <button onclick="answerVaccine(false)" class="btn-vaccine no">Нет</button>
+        <button id="btnYes" onclick="answerVaccine(true)" class="btn-vaccine yes">Да</button>
+        <button id="btnNo" onclick="answerVaccine(false)" class="btn-vaccine no">Нет</button>
       </div>
+      <div id="vaccineThankYou" class="thank-you hidden">✅ Спасибо за голос!</div>
       <div id="vaccineStats" class="stats">Загрузка статистики...</div>
     </div>
 
