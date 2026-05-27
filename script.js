@@ -12,7 +12,18 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ================== ВОПРОСЫ ==================
-const questions = [ /* твои 10 вопросов из предыдущих версий */ ];
+const questions = [
+  { q: "Что является основным переносчиком клещевого энцефалита?", options: ["Комары", "Клещи", "Мухи", "Блохи"], correct: 1 },
+  { q: "В какое время года наиболее опасны клещи?", options: ["Зима", "Весна и осень", "Только лето", "Круглый год одинаково"], correct: 1 },
+  { q: "Можно ли заразиться через молоко?", options: ["Нет", "Да, через сырое козье или коровье молоко", "Только через укус", "Через воздух"], correct: 1 },
+  { q: "Как правильно удалять клеща?", options: ["Выкручивать по часовой", "Выкручивать против часовой стрелки", "Сдавливать", "Прижигать"], correct: 1 },
+  { q: "Существует ли прививка от клещевого энцефалита?", options: ["Нет", "Да", "Только для детей", "Только для взрослых"], correct: 1 },
+  { q: "Что нельзя делать при укусе клеща?", options: ["Удалять пинцетом", "Капать масло", "Обрабатывать антисептиком", "Обратиться к врачу"], correct: 1 },
+  { q: "Какой цвет одежды лучше защищает от клещей?", options: ["Тёмный", "Светлый", "Красный", "Не имеет значения"], correct: 1 },
+  { q: "Сколько примерно длится инкубационный период?", options: ["1-2 дня", "7-14 дней", "1 месяц", "3 месяца"], correct: 1 },
+  { q: "Что является самым эффективным методом защиты?", options: ["Только репелленты", "Вакцинация + защита от укусов", "Только осмотр", "Антибиотики"], correct: 1 },
+  { q: "Куда нужно обращаться после укуса клеща?", options: ["В аптеку", "К инфекционисту или в травмпункт", "Домой", "В поликлинику через неделю"], correct: 1 }
+];
 
 let currentQ = 0, score = 0, userName = "", answers = [];
 
@@ -42,35 +53,19 @@ async function showAllResults() {
       const docId = doc.id;
       html += `
         <div class="result-item">
-          <div>
-            <strong>${r.name}</strong><br>
-            <small>${r.date}</small>
-          </div>
-          <div style="display:flex; align-items:center; gap:15px;">
-            <span style="font-size:22px; font-weight:700; color:#10b981;">${r.score}%</span>
-            <button onclick="deleteResult('${docId}')" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:10px; cursor:pointer;">🗑️</button>
-          </div>
+          <div><strong>${r.name}</strong><br><small>${r.date}</small></div>
+          <span style="font-size:24px; font-weight:700; color:#10b981;">${r.score}%</span>
         </div>`;
     });
 
-    container.innerHTML = html || '<p>Пока нет результатов</p>';
+    container.innerHTML = html || '<p>Результатов пока нет</p>';
   } catch (e) {
     container.innerHTML = '<p>Ошибка загрузки</p>';
   }
 }
 
-function deleteResult(docId) {
-  if (confirm("Удалить результат?")) {
-    db.collection("testResults").doc(docId).delete().then(() => showAllResults());
-  }
-}
-
-function exportToCSV() {
-  alert("✅ Экспорт в CSV скоро будет доступен!");
-}
-
 function loginAdmin() {
-  const pass = prompt("Введите пароль администратора:");
+  const pass = prompt("Введите пароль:");
   if (pass === "sofr2928") {
     document.getElementById('adminContent').classList.remove('hidden');
     showAllResults();
@@ -102,10 +97,7 @@ function showQuestion() {
   q.options.forEach((text, i) => {
     const div = document.createElement('div');
     div.className = 'option';
-    div.innerHTML = `
-      <input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})">
-      <span>${text}</span>
-    `;
+    div.innerHTML = `<input type="radio" name="q${currentQ}" onchange="selectAnswer(${i})"> ${text}`;
     opts.appendChild(div);
   });
 
@@ -143,8 +135,8 @@ async function showResult() {
   circle.style.borderColor = percent >= 80 ? '#10b981' : '#eab308';
 
   document.getElementById('resultMsg').innerHTML = percent >= 80 
-    ? 'Отличный результат! <span class="emoji-3d">🏆</span>' 
-    : 'Есть над чем поработать <span class="emoji-3d">📚</span>';
+    ? 'Отличный результат! 🏆' 
+    : 'Хорошая попытка! Есть над чем поработать 📚';
 
   await saveResultToFirebase(percent);
 }
